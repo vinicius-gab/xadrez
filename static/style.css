@@ -1,0 +1,53 @@
+/* NAVBAR */
+.navbar {
+  background-color: #1e1e1e !important;
+}
+
+/* Links da navbar */
+.navbar .nav-link {
+  color: #ffffff !important;
+}
+
+/* Hover dos links */
+.navbar .nav-link:hover {
+  color: #2e7d32 !important;
+}
+
+p{
+    color: #141414 !important;
+}
+.card:hover .card-text {
+  color: #2e7d32 !important;
+}
+.card:hover .card-title {
+  color: #ffffff !important;
+}
+/* CARDS */
+.card {
+  background-color: #1e1e1e;
+  color: #ffffff;
+  border: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Título do card */
+.card-title {
+  color: #2e7d32;
+}
+
+/* Texto do card */
+.card-text {
+  color: #e0e0e0;
+}
+
+/* HOVER do card */
+.card:hover {
+  background-color: #141414; /* mais escuro */
+  transform: translateY(-5px);
+}
+/* FOOTER */
+footer {
+  background-color: #1e1e1e;
+  color: #ffffff;
+}
+

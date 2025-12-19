@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Conteúdo</title>
+    <link rel="stylesheet" href="static\cadastro_conteudo.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+    <link rel="icon" href="static\assets\img\favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+    <header>
+        <div>
+            <div class="titulos">
+                <h1 class="pag_name">Biblioteca Mental</h1>
+                <h3 class="hello"> {{nome}},&nbsp;aqui você pode adicionar suas aberturas!</h3>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}"><i><i class="fa-solid fa-house-chimney"></i></i> Início</a></li>
+            </ul>
+        </nav>
+    </header>
+    <form method="POST" enctype="multipart/form-data">
+
+        <div>
+            <label for="nome">Nome:</label>
+            <input type="text" name="nome" id="nome" placeholder="Nome da abertura" required>
+        </div>
+
+        <div>
+            <label for="estilo">Estilo:</label>
+            <textarea name="estilo" id="estilo" placeholder="Diga o estilo do movimento"></textarea>
+        </div>
+
+        <div>
+            <label for="descricao">Descrição:</label>
+            <textarea name="descricao" id="descricao" placeholder="Diga o estilo do movimento"></textarea>
+        </div>
+
+        <div>
+            <label for="eco">ECO:</label>
+            <textarea name="eco" id="eco" placeholder="Digite o ECO da abertura"></textarea>
+        </div>
+        <div>
+            <label for="tipo">Tipo:</label>
+            <select name="tipo" id="tipo" required>
+                <option value="Abertura">Abertura</option>
+                <option value="Defesa">Defesa</option>
+                <option value="Gambito">Gambito</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="nivel">Nível:</label>
+            <select name="nivel" id="nivel" required>
+                <option value="Iniciante">Iniciante</option>
+                <option value="Intermediario">Intermediario</option>
+                <option value="Avançado">Avançado</option>
+            </select>
+        </div>
+        <div>
+
+        <div>
+            <label for="capa">Imagem do tabuleiro:</label>
+            <input type="file" name="capa" id="capa" accept="image/*">
+        </div>
+
+
+        <div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, msg in messages %}
+            <div class="alert {{ category }}">{{ msg }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <div>
+            <button type="submit">Cadastrar</button>
+        </div>
+    </form>
+</body>
+
+</html>

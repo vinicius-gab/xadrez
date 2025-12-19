@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='login_usuario.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+    <link rel="icon" href="{{ url_for('static', filename='assets/img/favicon.ico') }}">
+</head>
+
+<body>
+
+<header class="topo">
+    <div class="logo-area">
+        <img src="{{ url_for('static', filename='assets/img/logo.img.png') }}" alt="logo" class="logo">
+        <h1 class="pag_name">Biblioteca Mental</h1>
+    </div>
+
+    <nav>
+        <ul>
+            <li>
+                <a href="{{ url_for('index') }}">
+                    <i class="fa-solid fa-house-chimney"></i> Tela inicial
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<main class="caixa_form">
+    <form method="POST" class="form-login">
+
+        <h1 class="entrar">Entrar</h1>
+
+        <div class="inputs">
+            <input type="email" name="usuario" placeholder="Email" required autofocus>
+        </div>
+
+        <div class="inputs">
+            <input type="password" name="senha" placeholder="Senha" required>
+        </div>
+
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% if mensagens %}
+                {% for categoria, msg in mensagens %}
+                    <div class="alert {{ categoria }}">{{ msg }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <button type="submit" class="submit">Entrar</button>
+
+        <button type="button" class="cadastro"
+            onclick="window.location.href='{{ url_for('cadastro_usuario') }}';">
+            Ou cadastre-se
+        </button>
+
+
+    </form>
+</main>
+
+</body>
+</html>

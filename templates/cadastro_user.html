@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='cadastro_usuario.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+    <link rel="icon" href="{{ url_for('static', filename='assets/img/favicon.ico') }}">
+</head>
+
+<body>
+
+<header class="topo">
+    <div class="logo-area">
+        <img src="{{ url_for('static', filename='assets/img/logo.img.png') }}" alt="logo" class="logo">
+        <h1 class="pag_name">ChessLibrary</h1>
+    </div>
+
+    <nav>
+        <ul>
+            <li>
+                <a href="{{ url_for('index') }}">
+                    <i class="fa-solid fa-house-chimney"></i> Tela inicial
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<main class="container">
+    <form method="POST" class="form-cadastro">
+
+        <h1>Cadastro</h1>
+
+        <div class="inputs">
+            <input type="text" name="nome_user" placeholder="Nome" required>
+            <input type="email" name="Email_do_User" placeholder="Email" required>
+            <input type="password" name="Senha" placeholder="Senha" required>
+        </div>
+
+        <button type="submit" class="submit">Confirmar</button>
+
+    </form>
+</main>
+
+</body>
+</html>
