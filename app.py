@@ -16,50 +16,15 @@ app.secret_key = os.getenv('SECRET_KEY')
 def index():
     return render_template("inicio.html")
 
-# -------- Favoritar um conteúdo --------
-@app.route('/favoritar/<int:conteudo_id>', methods=['POST'])
-def favoritar(conteudo_id):
-    if 'id' not in session:
-        flash('Você precisa fazer login primeiro.', 'error')
-        return redirect(url_for('login_usuario'))
+@app.route('/aberturas')
+def pagina_aberturas():
+    con = ConectarBD()  # conexão com o banco
+    cursor = con.cursor(dictionary=True)  # retorna dicionários
+    cursor.execute("SELECT * FROM abertura")
+    aberturas = cursor.fetchall()
+    con.close()  # fechar conexão
+    return render_template('aberturas.html', nome=session.get('nome_usuario'), aberturas=aberturas)
 
-    id_user = session['id']
-
-    conexao = ConectarBD()
-    cursor = conexao.cursor()
-
-    cursor.execute(
-        "INSERT IGNORE INTO favorito (ID_Usuario, ID_Conteudo) VALUES (%s, %s)",
-        (id_user, conteudo_id)
-    )
-    conexao.commit()
-
-    cursor.close()
-    conexao.close()
-
-    return redirect(url_for(''))  # volta para a página da 
-
-@app.route('/desfavoritar/<int:conteudo_id>', methods=['POST'])
-def desfavoritar(conteudo_id):
-    if 'id' not in session:
-        flash('Você precisa fazer login primeiro.', 'error')
-        return redirect(url_for('login_usuario'))
-
-    id_user = session['id']
-
-    conexao = ConectarBD()
-    cursor = conexao.cursor()
-
-    cursor.execute(
-        "DELETE FROM favorito WHERE ID_Usuario = %s AND ID_Conteudo = %s;",
-        (id_user, conteudo_id)
-    )
-    conexao.commit()
-
-    cursor.close()
-    conexao.close()
-
-    return redirect(url_for(''))  # volta para a página da 
 
 
 # -------- Página de favoritos --------
@@ -143,7 +108,7 @@ def cadastro_usuario():
 @app.route('/cadastro_abertura', methods=['GET', 'POST'])
 def cadastro_abertura():
 
-    # 🔒 BLOQUEIO SE NÃO ESTIVER LOGADO
+    # 🔒 Bloqueio se não estiver logado
     if 'id_usuario' not in session:
         flash('Você precisa estar logado para acessar essa página.', 'warning')
         return redirect(url_for('login_usuario'))
@@ -156,28 +121,50 @@ def cadastro_abertura():
         tipo = request.form['tipo']
         nivel = request.form['nivel']
 
+        # arquivo enviado
+        img_file = request.files.get('img_tabuleiro')
+
         con = ConectarBD()
         cursor = con.cursor()
 
+        # 1️⃣ Inserir sem imagem primeiro
         cursor.execute(
             """
             INSERT INTO abertura
-            (Nome, estilo, Descricao, eco, tipo, nivel)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            (Nome, estilo, Descricao, eco, tipo, nivel, img_tabuleiro)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             """,
-            (nome, estilo, descricao, eco, tipo, nivel)
+            (nome, estilo, descricao, eco, tipo, nivel, None)
         )
 
         con.commit()
+        # pegar o ID da abertura recém-criada
+        id_abertura = cursor.lastrowid
+
+        # 2️⃣ Salvar imagem no diretório correto
+        if img_file and img_file.filename:
+            nome_arquivo, ext = os.path.splitext(img_file.filename)
+            novo_nome = f"{id_abertura}{ext}"
+
+            # pasta de upload
+            upload_folder = os.path.join('static', 'tabuleiros')
+            if not os.path.exists(upload_folder):
+                os.makedirs(upload_folder)  # cria a pasta caso não exista
+
+            caminho_upload = os.path.join(upload_folder, novo_nome)
+            img_file.save(caminho_upload)
+
+            # atualizar o banco com o nome do arquivo
+            cursor.execute(
+                "UPDATE abertura SET img_tabuleiro = %s WHERE idAbertura = %s",
+                (novo_nome, id_abertura)
+            )
+            con.commit()
 
         cursor.close()
         con.close()
 
-
         flash('Abertura cadastrada com sucesso!', 'success')
         return redirect(url_for('index'))
 
-    return render_template(
-        'cadastro_ab.html',
-        nome=session.get('nome_usuario')
-    )
+    return render_template('cadastro_ab.html', nome=session.get('nome_usuario'))
