@@ -12,11 +12,6 @@ UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = os.getenv('SECRET_KEY')
 
-print("DB_USER =", os.getenv('DB_USER'))
-print("DB_PASSWORD =", os.getenv('DB_PASSWORD'))
-print("DB_NAME =", os.getenv('DB_NAME'))
-
-
 @app.route("/")
 def index():
     return render_template("inicio.html")
@@ -94,24 +89,35 @@ def pagina_favoritos():
     return render_template('favoritos.html', favoritos=favoritos, nome=nome_user)
 
 
-@app.route('/login-usuario', methods=['GET','POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login_usuario():
     if request.method == 'POST':
-        email = request.form['usuario']   # campo do formulário
+        email = request.form['usuario']
         senha = request.form['senha']
 
-        resultado = login(email, senha)
+        conexao = ConectarBD()
+        cursor = conexao.cursor(dictionary=True, buffered=True)
 
-        if resultado:
-            session['id'] = resultado['idUsuario']
-            session['nome'] = resultado['Nome']
-            flash('Login feito com sucesso!', 'success')
+        cursor.execute(
+            "SELECT * FROM usuario WHERE email = %s AND senha = %s",
+            (email, senha)
+        )
+
+        usuario = cursor.fetchone()
+
+        cursor.close()
+        conexao.close()
+
+        if usuario:
+            session['id_usuario'] = usuario['idUsuario']
+            session['nome_usuario'] = usuario['Nome']
+            flash('Login realizado com sucesso!', 'success')
             return redirect(url_for('index'))
         else:
-            flash('Email ou senha incorretos.', 'error')
-            return redirect(url_for('login_usuario'))
+            flash('Email ou senha incorretos.', 'danger')
 
     return render_template('login_usuario.html')
+
 
 
 @app.route('/cadastro-usuario', methods=['GET','POST'])
@@ -134,11 +140,12 @@ def cadastro_usuario():
         return redirect(url_for('login_usuario'))
     return render_template('cadastro_user.html')
 
-@app.route('/cadastro-abertura', methods=['GET', 'POST'])
+@app.route('/cadastro_abertura', methods=['GET', 'POST'])
 def cadastro_abertura():
 
-    if 'id' not in session:
-        flash('Faça login para cadastrar uma abertura.', 'error')
+    # 🔒 BLOQUEIO SE NÃO ESTIVER LOGADO
+    if 'id_usuario' not in session:
+        flash('Você precisa estar logado para acessar essa página.', 'warning')
         return redirect(url_for('login_usuario'))
 
     if request.method == 'POST':
@@ -149,30 +156,28 @@ def cadastro_abertura():
         tipo = request.form['tipo']
         nivel = request.form['nivel']
 
-        imagem = request.files.get('capa')
-        nome_imagem = None
+        con = ConectarBD()
+        cursor = con.cursor()
 
-        if imagem and imagem.filename:
-            nome_imagem = secure_filename(imagem.filename)
-            imagem.save(os.path.join(app.config['UPLOAD_FOLDER'], nome_imagem))
-
-        conn = ConectarBD()
-        cursor = conn.cursor()
-
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO abertura
             (Nome, estilo, Descricao, eco, tipo, nivel)
             VALUES (%s, %s, %s, %s, %s, %s)
-        """, (nome, estilo, descricao, eco, tipo, nivel))
+            """,
+            (nome, estilo, descricao, eco, tipo, nivel)
+        )
 
-        conn.commit()
+        con.commit()
+
         cursor.close()
-        conn.close()
+        con.close()
+
 
         flash('Abertura cadastrada com sucesso!', 'success')
         return redirect(url_for('index'))
 
     return render_template(
         'cadastro_ab.html',
-        nome=session.get('nome')
+        nome=session.get('nome_usuario')
     )

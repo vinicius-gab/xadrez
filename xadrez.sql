@@ -32,7 +32,7 @@ CREATE TABLE `abertura` (
   `tipo` enum('Abertura','Gambito','Defesa') DEFAULT NULL,
   `nivel` enum('Iniciante','Intermediário','Avançado') DEFAULT NULL,
   PRIMARY KEY (`idAbertura`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,6 +41,7 @@ CREATE TABLE `abertura` (
 
 LOCK TABLES `abertura` WRITE;
 /*!40000 ALTER TABLE `abertura` DISABLE KEYS */;
+INSERT INTO `abertura` VALUES (1,'Gambito Letão',NULL,'O Gambito Letão surge após 1.e4 e5 2.Cf3 f5. As pretas sacrificam um peão logo no começo para abrir linhas e criar pressão imediata no centro e no rei adversário. É uma abertura arriscada, pouco usada em níveis altos, mas muito perigosa em partidas rápidas e contra jogadores despreparados.\r\n','C40\r\n','Abertura extremamente agressiva e tática, com sacrifício de peão para acelerar o desenvolvimento e atacar o rei branco desde o início.\r\n','Gambito','Intermediário'),(2,'Gambito Letão',NULL,'O Gambito Letão surge após 1.e4 e5 2.Cf3 f5. As pretas sacrificam um peão logo no começo para abrir linhas e criar pressão imediata no centro e no rei adversário. É uma abertura arriscada, pouco usada em níveis altos, mas muito perigosa em partidas rápidas e contra jogadores despreparados.\r\n','C40\r\n','Abertura extremamente agressiva e tática, com sacrifício de peão para acelerar o desenvolvimento e atacar o rei branco desde o início.\r\n','Gambito','Intermediário');
 /*!40000 ALTER TABLE `abertura` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -85,7 +86,7 @@ CREATE TABLE `usuario` (
   `Email` varchar(150) DEFAULT NULL,
   `Senha` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`idUsuario`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -94,6 +95,7 @@ CREATE TABLE `usuario` (
 
 LOCK TABLES `usuario` WRITE;
 /*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
+INSERT INTO `usuario` VALUES (1,'Teste Site','site@teste.com','1234'),(2,'Vinicius ','teste@gmail.com','123'),(3,'Vinicius ','teste@gmail.com','123'),(4,'Vini','email@teste.com','viniboy'),(5,'Vini','email@teste.com','viniboy'),(6,'Vini','email@teste.com','viniboy'),(7,'Vini','email@teste.com','viniboy'),(8,'Vini','email@teste.com','viniboy'),(9,'Vini','email@teste.com','123'),(10,'vinicius.palhares@escolar.ifrn.edu.br','email@teste.com','50419'),(11,'Vini','email@teste.com','viniboy'),(12,'vini','email@teste.com','123'),(13,'vini','email@teste.com','123'),(14,'Vini','email@teste.com','123'),(15,'Vini','email@teste.com','123');
 /*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -106,4 +108,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-17 10:54:24
+-- Dump completed on 2025-12-19 21:47:08
