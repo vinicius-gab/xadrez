@@ -8,6 +8,8 @@ load_dotenv()
 
 
 app = Flask(__name__)
+UPLOAD_FOLDER = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = os.getenv('SECRET_KEY')
 
 print("DB_USER =", os.getenv('DB_USER'))
@@ -135,9 +137,9 @@ def cadastro_usuario():
 @app.route('/cadastro-abertura', methods=['GET', 'POST'])
 def cadastro_abertura():
 
-#   if 'id' not in session:
-#        flash('Faça login para cadastrar uma abertura.', 'error')
-#        return redirect(url_for('login_usuario'))
+    if 'id' not in session:
+        flash('Faça login para cadastrar uma abertura.', 'error')
+        return redirect(url_for('login_usuario'))
 
     if request.method == 'POST':
         nome = request.form['nome']
@@ -147,35 +149,30 @@ def cadastro_abertura():
         tipo = request.form['tipo']
         nivel = request.form['nivel']
 
-        imagem = request.files['capa']
+        imagem = request.files.get('capa')
         nome_imagem = None
 
-        if imagem and imagem.filename != '':
+        if imagem and imagem.filename:
             nome_imagem = secure_filename(imagem.filename)
             imagem.save(os.path.join(app.config['UPLOAD_FOLDER'], nome_imagem))
 
         conn = ConectarBD()
         cursor = conn.cursor()
 
-        sql = """
-        INSERT INTO abertura
-        (nome, estilo, descricao, eco, tipo, nivel, imagem, idUsuario )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        """
+        cursor.execute("""
+            INSERT INTO abertura
+            (Nome, estilo, Descricao, eco, tipo, nivel)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (nome, estilo, descricao, eco, tipo, nivel))
 
-        dados = (
-            nome, estilo, descricao, eco,
-            tipo, nivel, nome_imagem, session['id']
-        )
-
-        cursor.execute(sql, dados)
         conn.commit()
-
         cursor.close()
         conn.close()
 
         flash('Abertura cadastrada com sucesso!', 'success')
-        return redirect(url_for(''))
+        return redirect(url_for('index'))
 
-    return render_template('cadastro_ab.html', nome=session.get('nome'))
-
+    return render_template(
+        'cadastro_ab.html',
+        nome=session.get('nome')
+    )
