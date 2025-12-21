@@ -86,25 +86,13 @@ def busca_cards(id_categoria, limite):
 
     return resultado
 
-def ajeitar_capa(conteudos):
-
-    upload_capas = os.path.join('static', 'assets', 'capas')
-
-    for cont in conteudos:
-        id_conteudo = cont['ID_Conteudo']
-        capa_path = None
-
-        for ext in ['.jpg', '.jpeg', '.png', '.webp', '.jfif']:
-            caminho = os.path.join(upload_capas, f"{id_conteudo}{ext}")
-            if os.path.exists(caminho):
-                capa_path = f"assets/capas/{id_conteudo}{ext}"
-                break
-
-        if not capa_path:
-            capa_path = "assets/img/no_image.jpg"
-
-        cont['CapaPath'] = capa_path  # adiciona o caminho no próprio dicionário
-
+def ajeitar_tabuleiro(aberturas):
+    for ab in aberturas:
+        if ab['img_tabuleiro']:
+            ab['TabuleiroPath'] = f"tabuleiros/{ab['img_tabuleiro']}"
+        else:
+            ab['TabuleiroPath'] = "assets/img/no_image.jpg"
+            
 def buscar_conteudos(termo):
     cnx = ConectarBD()
     cursor = cnx.cursor(dictionary=True)

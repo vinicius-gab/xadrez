@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from utils import ConectarBD, InserirAlterarRemover, login, get_info, cad_cont_id, busca_cards, ajeitar_capa, buscar_conteudos
+from utils import ConectarBD, InserirAlterarRemover, login, get_info, cad_cont_id, busca_cards, ajeitar_tabuleiro, buscar_conteudos
 import os
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
@@ -18,12 +18,31 @@ def index():
 
 @app.route('/aberturas')
 def pagina_aberturas():
-    con = ConectarBD()  # conexão com o banco
-    cursor = con.cursor(dictionary=True)  # retorna dicionários
+    con = ConectarBD()
+    cursor = con.cursor(dictionary=True)
+
     cursor.execute("SELECT * FROM abertura")
     aberturas = cursor.fetchall()
-    con.close()  # fechar conexão
-    return render_template('aberturas.html', nome=session.get('nome_usuario'), aberturas=aberturas)
+
+    favoritos_ids = []
+    if 'id_usuario' in session:
+        cursor.execute(
+            "SELECT id_abertura FROM favorito WHERE id_user = %s",
+            (session['id_usuario'],)
+        )
+        favoritos_ids = [f['id_abertura'] for f in cursor.fetchall()]
+
+    cursor.close()
+    con.close()
+
+    return render_template(
+        'aberturas.html',
+        aberturas=aberturas,
+        favoritos_ids=favoritos_ids,
+        nome=session.get('nome_usuario')
+    )
+
+
 
 
 
@@ -32,7 +51,7 @@ def pagina_aberturas():
 def pagina_favoritos():
     if 'id' not in session:
         flash('Você precisa fazer login primeiro.', 'error')
-        return redirect(url_for('login_simples'))
+        return redirect(url_for('login_usuario'))
 
     id_user = session['id']
     nome_user = session['nome']
@@ -40,19 +59,79 @@ def pagina_favoritos():
     conexao = ConectarBD()
     cursor = conexao.cursor(dictionary=True)
     cursor.execute("""
-        SELECT c.ID_Conteudo, c.Titulo, c.Sinopse, c.URL_Arquivo, c.ID_Categoria, c.Capa
-        FROM conteudo c
-        INNER JOIN favorito f ON c.ID_Conteudo = f.ID_Conteudo
-        WHERE f.ID_Usuario = %s
+    SELECT 
+        ab.idAbertura,
+        ab.Nome,
+        ab.Descricao,
+        ab.estilo,
+        ab.eco,
+        ab.nivel,
+        ab.tipo,
+        ab.img_tabuleiro
+    FROM abertura ab
+    INNER JOIN favorito f 
+        ON ab.idAbertura = f.id_abertura
+    WHERE f.id_user = %s
     """, (id_user,))
+
     favoritos = cursor.fetchall()
     cursor.close()
     conexao.close()
 
-    ajeitar_capa(favoritos)
+    ajeitar_tabuleiro(favoritos)
+
 
     return render_template('favoritos.html', favoritos=favoritos, nome=nome_user)
 
+@app.route('/desfavoritar/<int:id_abertura>', methods=['POST'])
+def desfavoritar_abertura(id_abertura):
+    if 'id_usuario' not in session:
+        return redirect(url_for('login_usuario'))
+
+    id_user = session['id_usuario']
+
+    con = ConectarBD()
+    cursor = con.cursor()
+
+    cursor.execute(
+        "DELETE FROM favorito WHERE id_user = %s AND id_abertura = %s",
+        (id_user, id_abertura)
+    )
+    con.commit()
+
+    cursor.close()
+    con.close()
+
+    return redirect(request.referrer)
+
+@app.route('/favoritar/<int:id_abertura>', methods=['POST'])
+def favoritar_abertura(id_abertura):
+    if 'id_usuario' not in session:
+        flash('Faça login para favoritar.', 'warning')
+        return redirect(url_for('login_usuario'))
+
+    id_user = session['id_usuario']
+
+    con = ConectarBD()
+    cursor = con.cursor()
+
+    # evita duplicar favorito
+    cursor.execute(
+        "SELECT 1 FROM favorito WHERE id_user = %s AND id_abertura = %s",
+        (id_user, id_abertura)
+    )
+
+    if not cursor.fetchone():
+        cursor.execute(
+            "INSERT INTO favorito (id_user, id_abertura) VALUES (%s, %s)",
+            (id_user, id_abertura)
+        )
+        con.commit()
+
+    cursor.close()
+    con.close()
+
+    return redirect(request.referrer)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_usuario():
@@ -61,10 +140,10 @@ def login_usuario():
         senha = request.form['senha']
 
         conexao = ConectarBD()
-        cursor = conexao.cursor(dictionary=True, buffered=True)
+        cursor = conexao.cursor(dictionary=True)
 
         cursor.execute(
-            "SELECT * FROM usuario WHERE email = %s AND senha = %s",
+            "SELECT idUsuario, Nome FROM usuario WHERE Email = %s AND Senha = %s",
             (email, senha)
         )
 
@@ -74,14 +153,17 @@ def login_usuario():
         conexao.close()
 
         if usuario:
-            session['id_usuario'] = usuario['idUsuario']
-            session['nome_usuario'] = usuario['Nome']
+            # 🔑 PADRÃO ÚNICO DE SESSÃO
+            session['id'] = usuario['idUsuario']
+            session['nome'] = usuario['Nome']
+
             flash('Login realizado com sucesso!', 'success')
             return redirect(url_for('index'))
         else:
-            flash('Email ou senha incorretos.', 'danger')
+            flash('Email ou senha incorretos.', 'error')
 
     return render_template('login_usuario.html')
+
 
 
 

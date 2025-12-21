@@ -45,6 +45,19 @@ p{
   background-color: #141414; /* mais escuro */
   transform: translateY(-5px);
 }
+
+.fav-btn {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: gold;
+}
+
+.fav-btn.favoritado {
+    color: orange;
+}
+
 /* FOOTER */
 footer {
   background-color: #1e1e1e;
