@@ -12,9 +12,12 @@
 <body class="bg-secondary">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
+          <form action="{{ url_for('pesquisa') }}" method="get">
+                <input type="search" id="search-input" name="q" class="search-input" placeholder="Pesquisar...">
+                <label for="search-input" class="search-button"><i class="fa-solid fa-magnifying-glass"></i></label>
+          </form>
         <h3 class="text-white">Olá, {{nome}},&nbsp;aqui você pode visualizar as aberturas!</h3>
         <a class="navbar-brand" href="#"></a>
-
         <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#menu">
             <span class="navbar-toggler-icon"></span>
         </button>

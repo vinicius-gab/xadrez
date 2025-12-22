@@ -39,7 +39,7 @@ def pagina_aberturas():
         'aberturas.html',
         aberturas=aberturas,
         favoritos_ids=favoritos_ids,
-        nome=session.get('nome_usuario')
+        nome=session.get('Nome')
     )
 
 
@@ -49,39 +49,44 @@ def pagina_aberturas():
 # -------- Página de favoritos --------
 @app.route('/favoritos')
 def pagina_favoritos():
-    if 'id' not in session:
-        flash('Você precisa fazer login primeiro.', 'error')
+    if 'id_usuario' not in session:
         return redirect(url_for('login_usuario'))
 
-    id_user = session['id']
-    nome_user = session['nome']
+    id_user = session['id_usuario']
+    nome_user = session['Nome']
+
 
     conexao = ConectarBD()
     cursor = conexao.cursor(dictionary=True)
+
     cursor.execute("""
-    SELECT 
-        ab.idAbertura,
-        ab.Nome,
-        ab.Descricao,
-        ab.estilo,
-        ab.eco,
-        ab.nivel,
-        ab.tipo,
-        ab.img_tabuleiro
-    FROM abertura ab
-    INNER JOIN favorito f 
-        ON ab.idAbertura = f.id_abertura
-    WHERE f.id_user = %s
+        SELECT 
+            ab.idAbertura,
+            ab.Nome,
+            ab.Descricao,
+            ab.estilo,
+            ab.eco,
+            ab.nivel,
+            ab.tipo,
+            ab.img_tabuleiro
+        FROM abertura ab
+        INNER JOIN favorito f 
+            ON ab.idAbertura = f.id_abertura
+        WHERE f.id_user = %s
     """, (id_user,))
 
     favoritos = cursor.fetchall()
+
     cursor.close()
     conexao.close()
 
     ajeitar_tabuleiro(favoritos)
 
-
-    return render_template('favoritos.html', favoritos=favoritos, nome=nome_user)
+    return render_template(
+        'favoritos.html',
+        favoritos=favoritos,
+        nome=nome_user
+    )
 
 @app.route('/desfavoritar/<int:id_abertura>', methods=['POST'])
 def desfavoritar_abertura(id_abertura):
@@ -153,9 +158,8 @@ def login_usuario():
         conexao.close()
 
         if usuario:
-            # 🔑 PADRÃO ÚNICO DE SESSÃO
-            session['id'] = usuario['idUsuario']
-            session['nome'] = usuario['Nome']
+            session['id_usuario'] = usuario['idUsuario']
+            session['Nome'] = usuario['Nome']
 
             flash('Login realizado com sucesso!', 'success')
             return redirect(url_for('index'))
@@ -188,13 +192,8 @@ def cadastro_usuario():
     return render_template('cadastro_user.html')
 
 @app.route('/cadastro_abertura', methods=['GET', 'POST'])
+
 def cadastro_abertura():
-
-    # 🔒 Bloqueio se não estiver logado
-    if 'id_usuario' not in session:
-        flash('Você precisa estar logado para acessar essa página.', 'warning')
-        return redirect(url_for('login_usuario'))
-
     if request.method == 'POST':
         nome = request.form['nome']
         estilo = request.form['estilo']
@@ -202,41 +201,30 @@ def cadastro_abertura():
         eco = request.form['eco']
         tipo = request.form['tipo']
         nivel = request.form['nivel']
-
-        # arquivo enviado
         img_file = request.files.get('img_tabuleiro')
 
         con = ConectarBD()
         cursor = con.cursor()
 
-        # 1️⃣ Inserir sem imagem primeiro
-        cursor.execute(
-            """
+        cursor.execute("""
             INSERT INTO abertura
             (Nome, estilo, Descricao, eco, tipo, nivel, img_tabuleiro)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """,
-            (nome, estilo, descricao, eco, tipo, nivel, None)
-        )
+        """, (nome, estilo, descricao, eco, tipo, nivel, None))
 
         con.commit()
-        # pegar o ID da abertura recém-criada
         id_abertura = cursor.lastrowid
 
-        # 2️⃣ Salvar imagem no diretório correto
         if img_file and img_file.filename:
-            nome_arquivo, ext = os.path.splitext(img_file.filename)
+            ext = os.path.splitext(img_file.filename)[1]
             novo_nome = f"{id_abertura}{ext}"
 
-            # pasta de upload
-            upload_folder = os.path.join('static', 'tabuleiros')
-            if not os.path.exists(upload_folder):
-                os.makedirs(upload_folder)  # cria a pasta caso não exista
+            pasta = os.path.join('static', 'tabuleiros')
+            os.makedirs(pasta, exist_ok=True)
 
-            caminho_upload = os.path.join(upload_folder, novo_nome)
-            img_file.save(caminho_upload)
+            caminho = os.path.join(pasta, novo_nome)
+            img_file.save(caminho)
 
-            # atualizar o banco com o nome do arquivo
             cursor.execute(
                 "UPDATE abertura SET img_tabuleiro = %s WHERE idAbertura = %s",
                 (novo_nome, id_abertura)
@@ -249,4 +237,34 @@ def cadastro_abertura():
         flash('Abertura cadastrada com sucesso!', 'success')
         return redirect(url_for('index'))
 
-    return render_template('cadastro_ab.html', nome=session.get('nome_usuario'))
+    return render_template(
+    'cadastro_ab.html',
+    nome=session.get('Nome')
+    )
+
+    
+
+@app.route('/pesquisa')
+def pesquisa():
+    nome_user = session.get('Nome')
+    id_user = session.get('id_usuario')
+    termo = request.args.get('q', '').strip()
+
+    resultados = []
+    if termo:
+        resultados = buscar_conteudos(termo)
+        ajeitar_tabuleiro(resultados)
+
+    id_user = session['id']
+
+    conexao = ConectarBD()
+    cursor = conexao.cursor(dictionary=True)
+    cursor.execute("SELECT idAbertura FROM favorito WHERE idUsuario = %s", (id_user,))
+    favoritos = cursor.fetchall()
+
+    favoritos_ids = [int(f['idAbertura']) for f in favoritos]
+
+    cursor.close()
+    conexao.close()
+
+    return render_template('pesquisa.html', termo=termo, resultados=resultados, nome=nome_user, favoritos_ids=favoritos_ids)
