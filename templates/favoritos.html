@@ -30,31 +30,40 @@
   <div class="row">
 
     {% for favorito in favoritos %}
-    <div class="col-md-4 mb-4">
-      <div class="card h-100">
+   <div class="col-md-4 mb-4">
+  <div class="card h-100 abertura-card">
 
-        <img src="{{ url_for('static', filename='tabuleiros/' ~ favorito.img_tabuleiro) }}"
-             class="card-img-top"
-             alt="{{ favorito.Nome }}">
+    <a href="{{ url_for('abertura_detalhada', id_abertura=favorito.idAbertura) }}"
+       class="stretched-link"></a>
 
-        <div class="card-body">
-          <h5 class="card-title">{{ favorito.Nome }}</h5>
-          <p class="card-text">{{ favorito.Descricao }}</p>
+    <img src="{{ url_for('static', filename='tabuleiros/' ~ favorito.img_tabuleiro) }}"
+         class="card-img-top"
+         alt="{{ favorito.Nome }}">
 
-          <span class="badge bg-primary">{{ favorito.tipo }}</span>
-          <span class="badge bg-success">{{ favorito.nivel }}</span>
-        </div>
+    <div class="card-body">
+      <h5 class="card-title">{{ favorito.Nome }}</h5>
+      <p class="card-text">{{ favorito.Descricao }}</p>
 
-        <div class="card-footer text-center">
-          <form action="{{ url_for('desfavoritar_abertura', id_abertura=favorito.idAbertura) }}"
-                method="post">
-            <button type="submit" class="btn btn-warning btn-sm">
-              <i class="fa-solid fa-star"></i> Remover favorito
-            </button>
-          </form>
-        </div>
+      <span class="badge bg-primary">{{ favorito.tipo }}</span>
+      <span class="badge bg-success">{{ favorito.nivel }}</span>
+    </div>
 
-      </div>
+    <div class="card-footer text-center">
+      <form action="{{ url_for('desfavoritar_abertura', id_abertura=favorito.idAbertura) }}"
+            method="post">
+        <button type="submit" class="btn btn-warning btn-sm">
+          Remover favorito
+        </button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+
+</div>
+
+
     </div>
     {% endfor %}
 

@@ -54,7 +54,9 @@
                     <p>{{ conteudo.Sinopse}}</p>
                 </div>
                 <div class="card_botao">
-                    <a href="{{ url_for('arquivo', idconteudo=conteudo.ID_Conteudo) }}">Conheça!</a>
+                    <a href="{{ url_for('abertura_detalhada', id_abertura=conteudo.idAbertura) }}">
+                        Conheça!
+                    </a>
                     {% if conteudo.ID_Conteudo in favoritos_ids %}
                     <form action="{{ url_for('desfavoritar', conteudo_id=conteudo.ID_Conteudo) }}" method="post"
                         class="fav-form">

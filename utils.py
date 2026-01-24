@@ -93,28 +93,36 @@ def ajeitar_tabuleiro(aberturas):
         else:
             ab['TabuleiroPath'] = "assets/img/no_image.jpg"
             
-def buscar_conteudos(termo):
-    cnx = ConectarBD()
-    cursor = cnx.cursor(dictionary=True)
+def buscar_aberturas(termo):
+    con = ConectarBD()
+    cursor = con.cursor(dictionary=True)
 
     sql = """
-        SELECT *,
-            CASE
-                WHEN Titulo LIKE %s THEN 3
-                WHEN Autor LIKE %s THEN 2
-                WHEN Sinopse LIKE %s THEN 1
-                ELSE 0
-            END AS relevancia
-        FROM conteudo
-        WHERE Titulo LIKE %s OR Autor LIKE %s OR Sinopse LIKE %s
-        ORDER BY relevancia DESC, Data_Inclusao DESC;
+        SELECT
+            idAbertura,
+            Nome,
+            Descricao,
+            estilo,
+            eco,
+            tipo,
+            nivel,
+            img_tabuleiro
+        FROM abertura
+        WHERE
+            Nome LIKE %s OR
+            Descricao LIKE %s OR
+            estilo LIKE %s OR
+            eco LIKE %s OR
+            tipo LIKE %s OR
+            nivel LIKE %s
     """
 
-    
-    termo_busca = f"%{termo}%"
-    cursor.execute(sql, (termo_busca, termo_busca, termo_busca, termo_busca, termo_busca, termo_busca))
+    like = f"%{termo}%"
+    cursor.execute(sql, (like, like, like, like, like, like))
 
     resultados = cursor.fetchall()
 
-    cnx.close()
+    cursor.close()
+    con.close()
+
     return resultados

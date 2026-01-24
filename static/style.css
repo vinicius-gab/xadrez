@@ -16,6 +16,10 @@
 p{
     color: #141414 !important;
 }
+
+p:hover{
+   color: #ffffff !important
+}
 .card:hover .card-text {
   color: #2e7d32 !important;
 }
@@ -56,6 +60,29 @@ p{
 
 .fav-btn.favoritado {
     color: orange;
+}
+
+/* Área principal */
+.abertura-detalhe {
+  background-color: #6f6f6f; /* cinza do mockup */
+  padding: 30px;
+  border-radius: 8px;
+}
+
+/* Caixa da imagem */
+.img-box {
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+/* Imagem do tabuleiro */
+.img-box img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 /* FOOTER */

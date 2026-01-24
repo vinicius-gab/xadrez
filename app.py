@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from utils import ConectarBD, InserirAlterarRemover, login, get_info, cad_cont_id, busca_cards, ajeitar_tabuleiro, buscar_conteudos
+from utils import ConectarBD, InserirAlterarRemover, login, get_info, cad_cont_id, busca_cards, ajeitar_tabuleiro, buscar_aberturas
 import os
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
@@ -27,7 +27,7 @@ def pagina_aberturas():
     favoritos_ids = []
     if 'id_usuario' in session:
         cursor.execute(
-            "SELECT id_abertura FROM favorito WHERE id_user = %s",
+            "SELECT id_abertura FROM favoritos WHERE id_user = %s",
             (session['id_usuario'],)
         )
         favoritos_ids = [f['id_abertura'] for f in cursor.fetchall()]
@@ -70,7 +70,7 @@ def pagina_favoritos():
             ab.tipo,
             ab.img_tabuleiro
         FROM abertura ab
-        INNER JOIN favorito f 
+        INNER JOIN favoritos f 
             ON ab.idAbertura = f.id_abertura
         WHERE f.id_user = %s
     """, (id_user,))
@@ -99,7 +99,7 @@ def desfavoritar_abertura(id_abertura):
     cursor = con.cursor()
 
     cursor.execute(
-        "DELETE FROM favorito WHERE id_user = %s AND id_abertura = %s",
+        "DELETE FROM favoritos WHERE id_user = %s AND id_abertura = %s",
         (id_user, id_abertura)
     )
     con.commit()
@@ -122,13 +122,13 @@ def favoritar_abertura(id_abertura):
 
     # evita duplicar favorito
     cursor.execute(
-        "SELECT 1 FROM favorito WHERE id_user = %s AND id_abertura = %s",
+        "SELECT 1 FROM favoritos WHERE id_user = %s AND id_abertura = %s",
         (id_user, id_abertura)
     )
 
     if not cursor.fetchone():
         cursor.execute(
-            "INSERT INTO favorito (id_user, id_abertura) VALUES (%s, %s)",
+            "INSERT INTO favoritos (id_user, id_abertura) VALUES (%s, %s)",
             (id_user, id_abertura)
         )
         con.commit()
@@ -246,25 +246,59 @@ def cadastro_abertura():
 
 @app.route('/pesquisa')
 def pesquisa():
-    nome_user = session.get('Nome')
-    id_user = session.get('id_usuario')
     termo = request.args.get('q', '').strip()
 
     resultados = []
     if termo:
-        resultados = buscar_conteudos(termo)
+        resultados = buscar_aberturas(termo)
         ajeitar_tabuleiro(resultados)
 
-    id_user = session['id']
+    id_user = session.get('id_usuario')
+    favoritos_ids = []
 
+    if id_user:
+        conexao = ConectarBD()
+        cursor = conexao.cursor(dictionary=True)
+
+        cursor.execute(
+            "SELECT id_abertura FROM favoritos WHERE id_user = %s",
+            (id_user,)
+        )
+        favoritos_ids = [f['id_abertura'] for f in cursor.fetchall()]
+
+        cursor.close()
+        conexao.close()
+
+    return render_template(
+        'pesquisa.html',
+        termo=termo,
+        resultados=resultados,
+        nome=session.get('nome_usuario'),
+        favoritos_ids=favoritos_ids
+    )
+
+@app.route('/abertura/<int:id_abertura>')
+def abertura_detalhada(id_abertura):
     conexao = ConectarBD()
     cursor = conexao.cursor(dictionary=True)
-    cursor.execute("SELECT idAbertura FROM favorito WHERE idUsuario = %s", (id_user,))
-    favoritos = cursor.fetchall()
 
-    favoritos_ids = [int(f['idAbertura']) for f in favoritos]
+    cursor.execute(
+        "SELECT * FROM abertura WHERE idAbertura = %s",
+        (id_abertura,)
+    )
+    abertura = cursor.fetchone()
 
     cursor.close()
     conexao.close()
 
-    return render_template('pesquisa.html', termo=termo, resultados=resultados, nome=nome_user, favoritos_ids=favoritos_ids)
+    if not abertura:
+        flash('Abertura não encontrada.', 'error')
+        return redirect(url_for('pagina_aberturas'))
+
+    ajeitar_tabuleiro([abertura])
+
+    return render_template(
+        'abertura_detalhada.html',
+        abertura=abertura,
+        nome=session.get('nome_usuario')
+    )

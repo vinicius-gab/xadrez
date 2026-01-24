@@ -24,16 +24,15 @@ DROP TABLE IF EXISTS `abertura`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `abertura` (
   `idAbertura` int NOT NULL AUTO_INCREMENT,
-  `Nome` varchar(45) DEFAULT NULL,
-  `Movimento` text,
+  `Nome` varchar(100) DEFAULT NULL,
   `Descricao` text,
-  `eco` varchar(5) DEFAULT NULL,
-  `estilo` varchar(150) DEFAULT NULL,
-  `tipo` enum('Abertura','Gambito','Defesa') DEFAULT NULL,
-  `nivel` enum('Iniciante','Intermediário','Avançado') DEFAULT NULL,
+  `Estilo` text,
+  `Eco` varchar(10) DEFAULT NULL,
+  `Tipo` enum('Abertura','Gambito','Defesa','Ataque','Sistema','Variante') DEFAULT NULL,
+  `Nivel` enum('Iniciante','Intermediário','Avançado') DEFAULT NULL,
   `img_tabuleiro` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`idAbertura`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -46,17 +45,47 @@ LOCK TABLES `abertura` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `favorito`
+-- Table structure for table `comentario`
 --
 
-DROP TABLE IF EXISTS `favorito`;
+DROP TABLE IF EXISTS `comentario`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `favorito` (
-  `idFavorito` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `comentario` (
+  `idComentario` int NOT NULL AUTO_INCREMENT,
+  `Texto` text NOT NULL,
+  `DataCriacao` datetime DEFAULT NULL,
   `id_user` int DEFAULT NULL,
   `id_abertura` int DEFAULT NULL,
-  PRIMARY KEY (`idFavorito`),
+  PRIMARY KEY (`idComentario`),
+  KEY `fk_user_comen_idx` (`id_user`),
+  KEY `fk_ab_comen_idx` (`id_abertura`),
+  CONSTRAINT `fk_ab_comen` FOREIGN KEY (`id_abertura`) REFERENCES `abertura` (`idAbertura`),
+  CONSTRAINT `fk_user_comen` FOREIGN KEY (`id_user`) REFERENCES `usuario` (`idUsuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `comentario`
+--
+
+LOCK TABLES `comentario` WRITE;
+/*!40000 ALTER TABLE `comentario` DISABLE KEYS */;
+/*!40000 ALTER TABLE `comentario` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `favoritos`
+--
+
+DROP TABLE IF EXISTS `favoritos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `favoritos` (
+  `idFavoritos` int NOT NULL AUTO_INCREMENT,
+  `id_user` int DEFAULT NULL,
+  `id_abertura` int DEFAULT NULL,
+  PRIMARY KEY (`idFavoritos`),
   KEY `fk_user_idx` (`id_user`),
   KEY `fk_abertura_idx` (`id_abertura`),
   CONSTRAINT `fk_abertura` FOREIGN KEY (`id_abertura`) REFERENCES `abertura` (`idAbertura`),
@@ -65,12 +94,12 @@ CREATE TABLE `favorito` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `favorito`
+-- Dumping data for table `favoritos`
 --
 
-LOCK TABLES `favorito` WRITE;
-/*!40000 ALTER TABLE `favorito` DISABLE KEYS */;
-/*!40000 ALTER TABLE `favorito` ENABLE KEYS */;
+LOCK TABLES `favoritos` WRITE;
+/*!40000 ALTER TABLE `favoritos` DISABLE KEYS */;
+/*!40000 ALTER TABLE `favoritos` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -82,11 +111,11 @@ DROP TABLE IF EXISTS `usuario`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `usuario` (
   `idUsuario` int NOT NULL AUTO_INCREMENT,
-  `Nome` varchar(200) DEFAULT NULL,
+  `Nome` varchar(150) DEFAULT NULL,
   `Email` varchar(150) DEFAULT NULL,
-  `Senha` varchar(10) DEFAULT NULL,
+  `Senha` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`idUsuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -107,4 +136,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-20 16:21:02
+-- Dump completed on 2025-12-23  8:40:07
