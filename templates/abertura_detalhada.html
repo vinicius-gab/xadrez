@@ -17,8 +17,13 @@
 <nav class="navbar navbar-expand-lg navbar-dark ">
     <div class="container">
       <h3 class="text-white">
-        Olá, {{ nome }}, essa é {{ abertura.Nome }}
+        {% if nome %}
+          Olá, {{ nome }}, essa é {{ abertura.Nome }}
+        {% else %}
+          Essa é {{ abertura.Nome }}
+        {% endif %}
       </h3>
+
       <a class="navbar-brand" href="#"></a>
 
       <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#menu">
@@ -81,6 +86,54 @@
   </div>
 
 </div>
+<hr class="text-white mt-4">
+
+<h4 class="text-white">Comentários</h4>
+
+<!-- FORMULÁRIO -->
+<form action="{{ url_for('comentar_abertura', id_abertura=abertura.idAbertura) }}"
+      method="post"
+      class="mb-4">
+
+  <div class="mb-3">
+    <textarea class="form-control"
+              name="comentario"
+              rows="3"
+              placeholder="Escreva seu comentário..."
+              required></textarea>
+  </div>
+
+  <button type="submit" class="btn btn-success">
+    Comentar
+  </button>
+</form>
+
+<hr class="text-white">
+
+<h4 class="text-white mt-4">Comentários</h4>
+
+{% if comentarios|length == 0 %}
+  <p class="text-white">Nenhum comentário ainda. Seja o primeiro a comentar!</p>
+{% endif %}
+
+{% for comentario in comentarios %}
+  <div class="card mb-3 comentario-card">
+    <div class="card-body">
+      <h6 class="card-subtitle mb-1 comentario-autor">
+        {{ comentario.Nome }}
+      </h6>
+
+      <small class="comentario-data">
+        {{ comentario.DataCriacao.strftime('%d/%m/%Y %H:%M') }}
+      </small>
+
+      <p class="card-text comentario-texto mt-2">
+        {{ comentario.Texto }}
+      </p>
+    </div>
+  </div>
+
+{% endfor %}
 
 </body>
 </html>

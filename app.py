@@ -282,23 +282,71 @@ def abertura_detalhada(id_abertura):
     conexao = ConectarBD()
     cursor = conexao.cursor(dictionary=True)
 
+    # Buscar abertura
     cursor.execute(
         "SELECT * FROM abertura WHERE idAbertura = %s",
         (id_abertura,)
     )
     abertura = cursor.fetchone()
 
-    cursor.close()
-    conexao.close()
-
     if not abertura:
+        cursor.close()
+        conexao.close()
         flash('Abertura não encontrada.', 'error')
         return redirect(url_for('pagina_aberturas'))
+
+    # Buscar comentários DAQUELA abertura
+    cursor.execute(
+        """
+        SELECT c.Texto, c.DataCriacao, u.Nome
+        FROM comentario c
+        INNER JOIN usuario u ON c.id_user = u.idUsuario
+        WHERE c.id_abertura = %s
+        ORDER BY c.DataCriacao DESC
+        """,
+        (id_abertura,)
+    )
+    comentarios = cursor.fetchall()
+
+    cursor.close()
+    conexao.close()
 
     ajeitar_tabuleiro([abertura])
 
     return render_template(
         'abertura_detalhada.html',
         abertura=abertura,
+        comentarios=comentarios,
         nome=session.get('nome_usuario')
     )
+
+@app.route('/abertura/<int:id_abertura>/comentar', methods=['POST'])
+def comentar_abertura(id_abertura):
+    if 'id_usuario' not in session:
+        flash('Você precisa estar logado para comentar.', 'error')
+        return redirect(url_for('abertura_detalhada', id_abertura=id_abertura))
+
+    texto = request.form.get('comentario')
+
+    if not texto:
+        flash('O comentário não pode estar vazio.', 'error')
+        return redirect(url_for('abertura_detalhada', id_abertura=id_abertura))
+
+    conexao = ConectarBD()
+    cursor = conexao.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO comentario (Texto, DataCriacao, id_user, id_abertura)
+        VALUES (%s, NOW(), %s, %s)
+        """,
+        (texto, session['id_usuario'], id_abertura)
+    )
+
+    conexao.commit()
+    cursor.close()
+    conexao.close()
+
+    flash('Comentário adicionado com sucesso!', 'success')
+    return redirect(url_for('abertura_detalhada', id_abertura=id_abertura))
+

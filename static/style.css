@@ -85,6 +85,38 @@ p:hover{
   object-fit: contain;
 }
 
+/* CARD DO COMENTÁRIO */
+.comentario-card {
+  background-color: #1e1e1e;
+  border: 1px solid #2e7d32;
+  border-radius: 8px;
+}
+
+/* Nome do usuário */
+.comentario-autor {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+/* Data */
+.comentario-data {
+  color: #9e9e9e;
+  font-size: 0.8rem;
+}
+
+/* Texto do comentário */
+.comentario-texto {
+  color: #ffffff !important;
+  line-height: 1.5;
+}
+
+.comentario-card:hover {
+  background-color: #141414;
+  transform: translateY(-2px);
+  transition: 0.2s ease;
+}
+
+
 /* FOOTER */
 footer {
   background-color: #1e1e1e;
