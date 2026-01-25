@@ -16,36 +16,6 @@ app.secret_key = os.getenv('SECRET_KEY')
 def index():
     return render_template("inicio.html")
 
-@app.route('/aberturas')
-def pagina_aberturas():
-    con = ConectarBD()
-    cursor = con.cursor(dictionary=True)
-
-    cursor.execute("SELECT * FROM abertura")
-    aberturas = cursor.fetchall()
-
-    favoritos_ids = []
-    if 'id_usuario' in session:
-        cursor.execute(
-            "SELECT id_abertura FROM favoritos WHERE id_user = %s",
-            (session['id_usuario'],)
-        )
-        favoritos_ids = [f['id_abertura'] for f in cursor.fetchall()]
-
-    cursor.close()
-    con.close()
-
-    return render_template(
-        'aberturas.html',
-        aberturas=aberturas,
-        favoritos_ids=favoritos_ids,
-        nome=session.get('Nome')
-    )
-
-
-
-
-
 # -------- Página de favoritos --------
 @app.route('/favoritos')
 def pagina_favoritos():
@@ -241,40 +211,39 @@ def cadastro_abertura():
     'cadastro_ab.html',
     nome=session.get('Nome')
     )
+   
+@app.route('/aberturas')
+def pagina_aberturas():
+    termo = request.args.get('q')  # pega o texto da pesquisa
 
-    
+    conexao = ConectarBD()
+    cursor = conexao.cursor(dictionary=True)
 
-@app.route('/pesquisa')
-def pesquisa():
-    termo = request.args.get('q', '').strip()
-
-    resultados = []
     if termo:
-        resultados = buscar_aberturas(termo)
-        ajeitar_tabuleiro(resultados)
-
-    id_user = session.get('id_usuario')
-    favoritos_ids = []
-
-    if id_user:
-        conexao = ConectarBD()
-        cursor = conexao.cursor(dictionary=True)
-
         cursor.execute(
-            "SELECT id_abertura FROM favoritos WHERE id_user = %s",
-            (id_user,)
+            """
+            SELECT *
+            FROM abertura
+            WHERE Nome LIKE %s
+               OR Descricao LIKE %s
+               OR Eco LIKE %s
+            """,
+            (f"%{termo}%", f"%{termo}%", f"%{termo}%")
         )
-        favoritos_ids = [f['id_abertura'] for f in cursor.fetchall()]
+    else:
+        cursor.execute("SELECT * FROM abertura")
 
-        cursor.close()
-        conexao.close()
+    aberturas = cursor.fetchall()
+
+    cursor.close()
+    conexao.close()
+
+    ajeitar_tabuleiro(aberturas)
 
     return render_template(
         'pesquisa.html',
-        termo=termo,
-        resultados=resultados,
-        nome=session.get('nome_usuario'),
-        favoritos_ids=favoritos_ids
+        aberturas=aberturas,
+        nome=session.get('nome_usuario')
     )
 
 @app.route('/abertura/<int:id_abertura>')

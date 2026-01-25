@@ -12,6 +12,18 @@
 <body class="bg-secondary">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
+          <form class="d-flex" method="get" action="{{ url_for('pagina_aberturas') }}">
+          <input
+            class="form-control me-2"
+            type="search"
+            name="q"
+            placeholder="Pesquisar abertura..."
+            value="{{ request.args.get('q', '') }}"
+          >
+          <button class="btn btn-success" type="submit">
+            Pesquisar
+          </button>
+        </form>
         <h3 class="text-white">Olá, {{nome}},&nbsp;aqui você pode visualizar as aberturas!</h3>
         <a class="navbar-brand" href="#"></a>
         <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#menu">

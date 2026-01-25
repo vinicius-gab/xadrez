@@ -1,85 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pesquisa</title>
-    <link rel="stylesheet" href="static\style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Aberturas de Xadrez</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- CSS próprio -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body class="bg-secondary">
-    <header>
-        <div>
-            <div class="titulos">
-                <h1 class="pag_name">ChessLibrary</h1>
-                <h3 class="hello"> {{nome}},&nbsp;aqui você pode procurar por conteúdos!</h3>
-            </div>
-        </div>
-        <div>
-            <form action="{{ url_for('pesquisa') }}" method="get">
-                    <input type="search" id="search-input" name="q" class="search-input" placeholder="Pesquisar...">
-                    <label for="search-input" class="search-button"><i class="fa-solid fa-magnifying-glass"></i></label>
-                </form>
-            <nav>
-                <ul>
-                    <li><a href="{{ url_for('index') }}"><i><i class="fa-solid fa-house-chimney"></i></i>Inicio</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
 
-    <div id="resultados">
-        <h1>Você pesquisou por: "{{ termo }}"</h1>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+
+    <a class="navbar-brand" href="{{ url_for('index') }}">Xadrez</a>
+
+    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="menu">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Início</a></li>
+        <li class="nav-item"><a class="nav-link active" href="{{ url_for('pagina_aberturas') }}">Aberturas</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('pagina_favoritos') }}">Favoritos</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro_abertura') }}">Cadastrar</a></li>
+      </ul>
     </div>
 
-    {% if not resultados %}
-        <p>Nenhum resultado encontrado para "{{ termo }}".</p>
-    {% else %}
-        <div class="container">
-            {% for conteudo in resultados %}
-                <div class="card">
-                <div class="card_img">
-                    <img src="{{ url_for('static', filename=conteudo.CapaPath) }}" alt="Capa do livro">
-                </div>
-                <div class="card_titulo">
-                    <h3>{{ conteudo.Titulo }}</h3>
-                </div>
-                <div class="card_texto">
-                    <p><strong>Autor(a): </strong>{{ conteudo.Autor }}</p>
-                    <p><strong>Ano de Publicação: </strong>{{ conteudo.Ano }}</p>
-                    <p><strong>Sinopse:</strong></p>
-                    <p>{{ conteudo.Sinopse}}</p>
-                </div>
-                <div class="card_botao">
-                    <a href="{{ url_for('abertura_detalhada', id_abertura=conteudo.idAbertura) }}">
-                        Conheça!
-                    </a>
-                    {% if conteudo.ID_Conteudo in favoritos_ids %}
-                    <form action="{{ url_for('desfavoritar', conteudo_id=conteudo.ID_Conteudo) }}" method="post"
-                        class="fav-form">
-                        <button type="submit"
-                            class="fav-btn {% if conteudo.ID_Conteudo in favoritos_ids %}favoritado{% endif %}">
-                            <i class="fa-solid fa-star"></i>
-                        </button>
-                    </form>
-                    {% else %}
-                    <form action="{{ url_for('favoritar', conteudo_id=conteudo.ID_Conteudo) }}" method="post"
-                        class="fav-form">
-                        <button type="submit"
-                            class="fav-btn {% if conteudo.ID_Conteudo in favoritos_ids %}favoritado{% endif %}">
-                            <i class="fa-regular fa-star"></i>
-                        </button>
-                    </form>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-    
-</body>
+  </div>
+</nav>
 
+<!-- CONTEÚDO -->
+<div class="container mt-4">
+
+  <!-- TÍTULO -->
+  <h2 class="text-white mb-4">
+    Aberturas de Xadrez
+  </h2>
+
+  <!-- BARRA DE PESQUISA -->
+  <form method="get" action="{{ url_for('pagina_aberturas') }}" class="mb-4">
+    <div class="input-group">
+      <input type="text"
+             name="q"
+             class="form-control"
+             placeholder="Pesquisar abertura, ECO ou descrição..."
+             value="{{ request.args.get('q', '') }}">
+
+      <button class="btn btn-success" type="submit">
+        Pesquisar
+      </button>
+    </div>
+  </form>
+
+  <!-- RESULTADOS -->
+  <div class="row">
+
+    {% for abertura in aberturas %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 abertura-card"
+             onclick="window.location.href='{{ url_for('abertura_detalhada', id_abertura=abertura.idAbertura) }}'">
+
+          <img src="{{ url_for('static', filename='tabuleiros/' ~ abertura.img_tabuleiro) }}"
+               class="card-img-top"
+               alt="{{ abertura.Nome }}">
+
+          <div class="card-body">
+            <h5 class="card-title">{{ abertura.Nome }}</h5>
+            <p class="card-text">{{ abertura.Descricao }}</p>
+
+            <span class="badge bg-primary">{{ abertura.Tipo }}</span>
+            <span class="badge bg-success">{{ abertura.Nivel }}</span>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+  </div>
+
+  <!-- SEM RESULTADOS -->
+  {% if aberturas|length == 0 %}
+    <p class="text-white text-center mt-4">
+      Nenhuma abertura encontrada 😕
+    </p>
+  {% endif %}
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
 </html>
