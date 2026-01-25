@@ -35,7 +35,6 @@
       <ul class="navbar-nav ms-auto">
         <li class="nav-item"><a class="nav-link" href="#topo">Início</a></li>
         <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
-        <li class="nav-item"><a class="nav-link" href="#abertura">Aberturas</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ url_for('pagina_favoritos') }}">Favoritos</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro_abertura') }}">Cadastro Abertura</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro_usuario') }}">Se cadastre agora</a></li>
@@ -103,94 +102,34 @@
     </p>
   </section>
 
-  <section id="abertura" class="container my-4">
-    <h2 class="mb-4 text-center text-white">Aberturas de Xadrez</h2>
+<section id="abertura" class="container my-4">
+  <h2 class="mb-4 text-center text-white">Aberturas de Xadrez</h2>
 
-    <div class="row g-3">
+  <div class="row g-3">
 
-    <div class="col-md-4">
-        <article class="card h-100">
-          <img src="static/assents/img/Def_sici.png" class="card-img-top" alt="Capa Animes e Mangás">
+    {% for abertura in aberturas %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 abertura-card"
+             onclick="window.location.href='{{ url_for('abertura_detalhada', id_abertura=abertura.idAbertura) }}'">
+
+          <img src="{{ url_for('static', filename='tabuleiros/' ~ abertura.img_tabuleiro) }}"
+               class="card-img-top"
+               alt="{{ abertura.Nome }}">
+
           <div class="card-body">
-            <h5 class="card-title">Defesa Siciliana</h5>
-            <p class="card-text">
-              A defesa mais popular contra 1.e4, focada em contra-ataque.
-            </p>
+            <h5 class="card-title">{{ abertura.Nome }}</h5>
+            <p class="card-text">{{ abertura.Descricao }}</p>
+
+            <span class="badge bg-primary">{{ abertura.Tipo }}</span>
+            <span class="badge bg-success">{{ abertura.Nivel }}</span>
           </div>
-        </article>
-    </div>
-      <div class="col-md-4">
-        <article class="card">
-          <img src="static/assents/img/Ab_Ita.png" class="card-img-top" alt="Capa do livro O Herói Perdido">
-          <div class="card-body">
-            <h5 class="card-title">Abertura Italiana</h5>
-            <p class="card-text">Ideal para iniciantes, foca no controle do centro.</p>
-          </div>
-        </article>
+        </div>
       </div>
+    {% endfor %}
 
-      <div class="col-md-4">
-        <article class="card">
-          <img src="static/assents/img/Def_Fran.png" class="card-img-top" alt="Capa do livro Profecia das Sombras">
-          <div class="card-body">
-            <h5 class="card-title">Defesa Francesa</h5>
-            <p class="card-text">Estrutura de peões firme, muito usada em jogos posicionais.</p>
-          </div>
-        </article>
-      </div>
+  </div>
+</section>
 
-      <div class="col-md-4">
-        <article class="card">
-          <img src="static/assents/img/Gam_dama.png" class="card-img-top" alt="Capa do livro Profecia das Sombras">
-          <div class="card-body">
-            <h5 class="card-title">Gambito da Dama</h5>
-            <p class="card-text">Uma das aberturas mais clássicas do xadrez moderno.</p>
-          </div>
-        </article>
-      </div>
-
-      <div class="col-md-4">
-        <article class="card">
-          <img src="static/assents/img/Def_CK.png" class="card-img-top" alt="Capa do livro Profecia das Sombras">
-          <div class="card-body">
-            <h5 class="card-title">Defesa Caro-Kann</h5>
-            <p class="card-text">Popular entre jogadores que gostam de posições seguras.</p>
-          </div>
-        </article>
-      </div>  
-
-      <div class="col-md-4">
-        <article class="card">
-          <img src="static/assents/img/Def_Pirc.png" class="card-img-top" alt="Capa do livro Profecia das Sombras">
-          <div class="card-body">
-            <h5 class="card-title">Defesa Pirc</h5>
-            <p class="card-text">As pretas permitem o centro para contra-atacar depois.</p>
-          </div>
-        </article>
-      </div>
-
-      <div class="col-md-4">
-        <article class="card">
-          <img src="static/assents/img/Ab_Ingl.png" class="card-img-top" alt="Capa do livro Profecia das Sombras">
-          <div class="card-body">
-            <h5 class="card-title">Abertura Inglesa</h5>
-            <p class="card-text">Controle de centro à distância, com muitas transposições.</p>
-          </div>
-        </article>
-      </div>
-      
-      <div class="col-md-4">
-        <article class="card">
-          <img src="static/assents/img/Def_DIR.png" class="card-img-top" alt="Capa do livro Profecia das Sombras">
-          <div class="card-body">
-            <h5 class="card-title">Defesa Índia do Rei(DIR)</h5>
-            <p class="card-text">Abertura dinâmica com ataques fortes ao rei.</p>
-          </div>
-        </article>
-      </div>
-    </div>
-
-  </section>
 
   <footer class="bg-dark text-white text-center py-2 mt-4">
     Fim do site

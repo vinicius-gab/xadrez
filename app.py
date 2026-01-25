@@ -14,7 +14,20 @@ app.secret_key = os.getenv('SECRET_KEY')
 
 @app.route("/")
 def index():
-    return render_template("inicio.html")
+    conexao = ConectarBD()
+    cursor = conexao.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT *
+        FROM abertura
+        LIMIT 6
+    """)
+
+    aberturas = cursor.fetchall()
+    cursor.close()
+
+    return render_template("inicio.html", aberturas=aberturas)
+
 
 # -------- Página de favoritos --------
 @app.route('/favoritos')
