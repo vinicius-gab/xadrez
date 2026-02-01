@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
-from utils import ConectarBD, InserirAlterarRemover, login, get_info, cad_cont_id, busca_cards, ajeitar_tabuleiro, buscar_aberturas
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from utils import ConectarBD, InserirAlterarRemover, login, get_info, cad_cont_id, busca_cards, ajeitar_tabuleiro, buscar_aberturas, exigir_login
 import os
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
@@ -94,16 +94,16 @@ def desfavoritar_abertura(id_abertura):
 
 @app.route('/favoritar/<int:id_abertura>', methods=['POST'])
 def favoritar_abertura(id_abertura):
-    if 'id_usuario' not in session:
-        flash('Faça login para favoritar.', 'warning')
-        return redirect(url_for('login_usuario'))
+
+    redirecionamento = exigir_login()
+    if redirecionamento:
+        return redirecionamento
 
     id_user = session['id_usuario']
 
     con = ConectarBD()
     cursor = con.cursor()
 
-    # evita duplicar favorito
     cursor.execute(
         "SELECT 1 FROM favoritos WHERE id_user = %s AND id_abertura = %s",
         (id_user, id_abertura)
@@ -304,10 +304,11 @@ def abertura_detalhada(id_abertura):
 
 @app.route('/abertura/<int:id_abertura>/comentar', methods=['POST'])
 def comentar_abertura(id_abertura):
-    if 'id_usuario' not in session:
-        flash('Você precisa estar logado para comentar.', 'error')
-        return redirect(url_for('abertura_detalhada', id_abertura=id_abertura))
 
+    redirecionamento = exigir_login()
+    if redirecionamento:
+        return redirecionamento
+    
     texto = request.form.get('comentario')
 
     if not texto:
@@ -331,4 +332,3 @@ def comentar_abertura(id_abertura):
 
     flash('Comentário adicionado com sucesso!', 'success')
     return redirect(url_for('abertura_detalhada', id_abertura=id_abertura))
-

@@ -116,6 +116,23 @@ p:hover{
   transition: 0.2s ease;
 }
 
+.fav-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #adb5bd;
+  cursor: pointer;
+}
+
+.fav-btn:hover {
+  color: #ffc107;
+}
+
+.fav-btn.favoritado {
+  color: #ffc107;
+}
+
+
 
 /* FOOTER */
 footer {

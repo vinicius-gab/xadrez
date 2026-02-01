@@ -1,4 +1,5 @@
 from mysql.connector import (connection)
+from flask import session, redirect, url_for, flash
 from dotenv import load_dotenv
 import os
 
@@ -126,3 +127,9 @@ def buscar_aberturas(termo):
     con.close()
 
     return resultados
+
+def exigir_login():
+    if 'id_usuario' not in session:
+        flash('Você precisa estar logado para acessar essa página.', 'error')
+        return redirect(url_for('cadastro_usuario'))
+    return None

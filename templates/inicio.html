@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Meu Site</title>
+  <title>ChessLibrary</title>
   <link rel="stylesheet" href="static/style.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
 </head>
 
 <body id="topo" class="bg-secondary">
@@ -33,14 +34,50 @@
 
       <div class="collapse navbar-collapse" id="menu">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="#topo">Início</a></li>
-        <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('pagina_favoritos') }}">Favoritos</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro_abertura') }}">Cadastro Abertura</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro_usuario') }}">Se cadastre agora</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('pagina_aberturas') }}">Acesse as aberturas</a></li>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="#topo">
+            <i class="fa-solid fa-house"></i>
+            Início
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="#sobre">
+            <i class="fa-solid fa-question"></i>
+            Sobre
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="{{ url_for('pagina_favoritos') }}">
+            <i class="fa-solid fa-star"></i>
+            Favoritos
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="{{ url_for('cadastro_abertura') }}">
+            <i class="fa-solid fa-chess"></i>
+            Cadastro Abertura
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="{{ url_for('cadastro_usuario') }}">
+            <i class="fa-solid fa-circle-user"></i>
+            Se cadastre agora
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="{{ url_for('pagina_aberturas') }}">
+            <i class="fa-solid fa-chess-board"></i>
+            Acesse as aberturas
+          </a>
+        </li>
 
       </ul>
+
       </div>
 
     </div>
@@ -109,23 +146,56 @@
 
     {% for abertura in aberturas %}
       <div class="col-md-4 mb-4">
-        <div class="card h-100 abertura-card"
-             onclick="window.location.href='{{ url_for('abertura_detalhada', id_abertura=abertura.idAbertura) }}'">
+  <div class="card h-100 abertura-card d-flex flex-column"
+       onclick="window.location.href='{{ url_for('abertura_detalhada', id_abertura=abertura.idAbertura) }}'"
+       style="cursor: pointer;">
 
-          <img src="{{ url_for('static', filename='tabuleiros/' ~ abertura.img_tabuleiro) }}"
-               class="card-img-top"
-               alt="{{ abertura.Nome }}">
+    <!-- IMAGEM -->
+    <img src="{{ url_for('static', filename='tabuleiros/' ~ abertura.img_tabuleiro) }}"
+         class="card-img-top"
+         alt="{{ abertura.Nome }}">
 
-          <div class="card-body">
-            <h5 class="card-title">{{ abertura.Nome }}</h5>
-            <p class="card-text">{{ abertura.Descricao }}</p>
+    <!-- CORPO -->
+    <div class="card-body">
+      <h5 class="card-title">{{ abertura.Nome }}</h5>
+      <p class="card-text">{{ abertura.Descricao }}</p>
 
-            <span class="badge bg-primary">{{ abertura.Tipo }}</span>
-            <span class="badge bg-success">{{ abertura.Nivel }}</span>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
+      <span class="badge bg-primary">{{ abertura.Tipo }}</span>
+      <span class="badge bg-success">{{ abertura.Nivel }}</span>
+    </div>
+
+    <!-- RODAPÉ (sempre embaixo) -->
+    <div class="card-footer bg-transparent border-0 text-end">
+
+      {% if abertura.idAbertura in favoritos_ids %}
+        <form action="{{ url_for('desfavoritar_abertura', id_abertura=abertura.idAbertura) }}"
+              method="post"
+              class="d-inline">
+          <button type="submit"
+                  class="fav-btn favoritado"
+                  onclick="event.stopPropagation()">
+            <i class="fa-solid fa-star"></i>
+          </button>
+        </form>
+      {% else %}
+        <form action="{{ url_for('favoritar_abertura', id_abertura=abertura.idAbertura) }}"
+              method="post"
+              class="d-inline">
+          <button type="submit"
+                  class="fav-btn"
+                  onclick="event.stopPropagation()">
+            <i class="fa-regular fa-star"></i>
+          </button>
+        </form>
+      {% endif %}
+
+    </div>
+
+  </div>
+</div>
+
+{% endfor %}
+
 
   </div>
 </section>

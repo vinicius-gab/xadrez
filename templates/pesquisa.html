@@ -66,6 +66,10 @@
         <div class="card h-100 abertura-card"
              onclick="window.location.href='{{ url_for('abertura_detalhada', id_abertura=abertura.idAbertura) }}'">
 
+            <button class="fav-btn"
+              onclick="event.stopPropagation()"
+              data-url="{{ url_for('favoritar_abertura', id_abertura=abertura.idAbertura) }}">
+            </button>
           <img src="{{ url_for('static', filename='tabuleiros/' ~ abertura.img_tabuleiro) }}"
                class="card-img-top"
                alt="{{ abertura.Nome }}">
