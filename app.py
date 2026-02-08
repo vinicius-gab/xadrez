@@ -14,6 +14,8 @@ app.secret_key = os.getenv('SECRET_KEY')
 
 @app.route("/")
 def index():
+    id_user = session.get("id_user")
+
     conexao = ConectarBD()
     cursor = conexao.cursor(dictionary=True)
 
@@ -22,11 +24,28 @@ def index():
         FROM abertura
         LIMIT 6
     """)
-
     aberturas = cursor.fetchall()
+
+    favoritos_ids = set()
+
+    if id_user:
+        cursor.execute("""
+            SELECT idAbertura
+            FROM favoritos
+            WHERE id_user = %s
+        """, (id_user,))
+        favoritos_ids = {row["idAbertura"] for row in cursor.fetchall()}
+
     cursor.close()
 
-    return render_template("inicio.html", aberturas=aberturas)
+    return render_template(
+        "inicio.html",
+        aberturas=aberturas,
+        favoritos_ids=favoritos_ids
+    )
+
+
+
 
 
 # -------- Página de favoritos --------
@@ -227,36 +246,28 @@ def cadastro_abertura():
    
 @app.route('/aberturas')
 def pagina_aberturas():
-    termo = request.args.get('q')  # pega o texto da pesquisa
+    id_user = session.get('id_user')
 
-    conexao = ConectarBD()
-    cursor = conexao.cursor(dictionary=True)
+    con = ConectarBD()
+    cursor = con.cursor()
 
-    if termo:
-        cursor.execute(
-            """
-            SELECT *
-            FROM abertura
-            WHERE Nome LIKE %s
-               OR Descricao LIKE %s
-               OR Eco LIKE %s
-            """,
-            (f"%{termo}%", f"%{termo}%", f"%{termo}%")
-        )
-    else:
-        cursor.execute("SELECT * FROM abertura")
-
+    # Todas as aberturas
+    cursor.execute("SELECT * FROM aberturas")
     aberturas = cursor.fetchall()
 
-    cursor.close()
-    conexao.close()
+    favoritos_ids = set()
 
-    ajeitar_tabuleiro(aberturas)
+    if id_user:
+        cursor.execute(
+            "SELECT id_abertura FROM favoritos WHERE id_user = %s",
+            (id_user,)
+        )
+        favoritos_ids = {row['id_abertura'] for row in cursor.fetchall()}
 
     return render_template(
-        'pesquisa.html',
+        'index.html',
         aberturas=aberturas,
-        nome=session.get('nome_usuario')
+        favoritos_ids=favoritos_ids
     )
 
 @app.route('/abertura/<int:id_abertura>')

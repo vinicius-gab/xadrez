@@ -116,23 +116,28 @@ p:hover{
   transition: 0.2s ease;
 }
 
-.fav-btn {
+.fav-btn-text {
   background: none;
-  border: none;
-  font-size: 22px;
-  color: #adb5bd;
+  border: 1px solid #ffc107;
+  color: #ffc107;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.fav-btn:hover {
-  color: #ffc107;
+.fav-btn-text:hover {
+  background-color: #ffc107;
+  color: #000;
 }
 
-.fav-btn.favoritado {
-  color: #ffc107;
+.fav-btn-text.favoritado {
+  background-color: #ffc107;
+  color: #000;
 }
-
-
 
 /* FOOTER */
 footer {
