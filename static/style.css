@@ -13,13 +13,13 @@
   color: #2e7d32 !important;
 }
 
-p {
+text-card-inicio {
     color: #ffffff !important; 
 }
 
 /* Garante que o texto da descrição do card seja branco/cinza claro */
 .card-text {
-    color: #e0e0e0 !important; 
+    color: #000000 !important; 
 }
 
 .card:hover .card-text {

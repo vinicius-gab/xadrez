@@ -45,6 +45,18 @@ LOCK TABLES `abertura` WRITE;
 UNLOCK TABLES;
 
 --
+DROP TABLE IF EXISTS `usuario`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `usuario` (
+  `idUsuario` int NOT NULL AUTO_INCREMENT,
+  `Nome` varchar(150) DEFAULT NULL,
+  `Email` varchar(150) DEFAULT NULL,
+  `Senha` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`idUsuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 -- Table structure for table `comentario`
 --
 
@@ -102,21 +114,6 @@ LOCK TABLES `favoritos` WRITE;
 /*!40000 ALTER TABLE `favoritos` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `usuario`
---
-
-DROP TABLE IF EXISTS `usuario`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `usuario` (
-  `idUsuario` int NOT NULL AUTO_INCREMENT,
-  `Nome` varchar(150) DEFAULT NULL,
-  `Email` varchar(150) DEFAULT NULL,
-  `Senha` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`idUsuario`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `usuario`
