@@ -143,7 +143,7 @@
 
     {% for abertura in aberturas %}
       <div class="col-md-4 mb-4">
-  <div class="card h-100 abertura-card d-flex flex-column"
+    <div class="card h-100 abertura-card d-flex flex-column"
        onclick="window.location.href='{{ url_for('abertura_detalhada', id_abertura=abertura.idAbertura) }}'"
        style="cursor: pointer;">
 
@@ -163,43 +163,27 @@
 
     <!-- RODAPÉ (sempre embaixo) -->
     <div class="card-footer bg-transparent border-0 text-end">
-
-      {% if abertura['idAbertura'] in favoritos_ids %}
-        <form action="{{ url_for('desfavoritar_abertura', id_abertura=abertura['idAbertura']) }}"
-              method="post"
-              class="d-inline">
-          <button type="submit"
-                  class="fav-btn-text favoritado"
-                  onclick="event.stopPropagation()">
+      {% if abertura.idAbertura in favoritos_ids %}
+        <form action="{{ url_for('desfavoritar_abertura', id_abertura=abertura.idAbertura) }}" method="post" class="d-inline">
+          <button type="submit" class="fav-btn-text favoritado" onclick="event.stopPropagation()">
             Remover favorito
           </button>
         </form>
       {% else %}
-        <form action="{{ url_for('favoritar_abertura', id_abertura=abertura['idAbertura']) }}"
-              method="post"
-              class="d-inline">
-          <button type="submit"
-                  class="fav-btn-text"
-                  onclick="event.stopPropagation()">
+        <form action="{{ url_for('favoritar_abertura', id_abertura=abertura.idAbertura) }}" method="post" class="d-inline">
+          <button type="submit" class="fav-btn-text" onclick="event.stopPropagation()">
             Favoritar
           </button>
         </form>
       {% endif %}
-
-
-
     </div>
 
   </div>
 </div>
 
 {% endfor %}
-
-
   </div>
 </section>
-
-
 
   <footer class="bg-dark text-white text-center py-2 mt-4">
     Fim do site

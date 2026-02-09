@@ -14,39 +14,37 @@ app.secret_key = os.getenv('SECRET_KEY')
 
 @app.route("/")
 def index():
-    id_user = session.get("id_user")
+    # 1. Padronize para 'id_usuario' (o mesmo que você usou no login)
+    id_user = session.get("id_usuario") 
 
     conexao = ConectarBD()
     cursor = conexao.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT *
-        FROM abertura
-        LIMIT 6
-    """)
+    # Pegar as aberturas
+    cursor.execute("SELECT * FROM abertura LIMIT 6")
     aberturas = cursor.fetchall()
 
     favoritos_ids = set()
 
     if id_user:
+        # 2. No banco, a coluna na tabela favoritos chama-se 'id_abertura'
         cursor.execute("""
-            SELECT idAbertura
-            FROM favoritos
+            SELECT id_abertura 
+            FROM favoritos 
             WHERE id_user = %s
         """, (id_user,))
-        favoritos_ids = {row["idAbertura"] for row in cursor.fetchall()}
+        
+        # Criamos um conjunto de IDs para busca rápida no HTML
+        favoritos_ids = {row["id_abertura"] for row in cursor.fetchall()}
 
     cursor.close()
+    conexao.close()
 
     return render_template(
         "inicio.html",
         aberturas=aberturas,
         favoritos_ids=favoritos_ids
     )
-
-
-
-
 
 # -------- Página de favoritos --------
 @app.route('/favoritos')
@@ -246,30 +244,35 @@ def cadastro_abertura():
    
 @app.route('/aberturas')
 def pagina_aberturas():
-    id_user = session.get('id_user')
+    id_user = session.get('id_usuario') # Lembre-se de usar 'id_usuario'
 
     con = ConectarBD()
-    cursor = con.cursor()
+    # ADICIONE dictionary=True AQUI:
+    cursor = con.cursor(dictionary=True) 
 
-    # Todas as aberturas
-    cursor.execute("SELECT * FROM aberturas")
+    # Buscar todas as aberturas
+    cursor.execute("SELECT * FROM abertura") # Corrigido para o singular
     aberturas = cursor.fetchall()
 
     favoritos_ids = set()
 
     if id_user:
+        # Aqui o cursor já é dicionário por causa da linha lá de cima
         cursor.execute(
             "SELECT id_abertura FROM favoritos WHERE id_user = %s",
             (id_user,)
         )
+        # Agora o row['id_abertura'] vai funcionar porque é um dicionário
         favoritos_ids = {row['id_abertura'] for row in cursor.fetchall()}
 
+    cursor.close()
+    con.close()
+
     return render_template(
-        'index.html',
+        'pesquisa.html', # Nome corrigido do template
         aberturas=aberturas,
         favoritos_ids=favoritos_ids
     )
-
 @app.route('/abertura/<int:id_abertura>')
 def abertura_detalhada(id_abertura):
     conexao = ConectarBD()

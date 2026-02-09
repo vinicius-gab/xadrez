@@ -11,7 +11,7 @@
 </head>
  
 <body class="bg-secondary">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
           <form class="d-flex" method="get" action="{{ url_for('pagina_aberturas') }}">
           <input
@@ -32,14 +32,26 @@
         </button>
 
         <div class="collapse navbar-collapse" id="menu">
-        <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Início</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Sobre</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('pagina_favoritos') }}">Favoritos</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro_abertura') }}">Cadastro Abertura</a></li>
-        </ul>
-        </div>
+          <ul class="navbar-nav ms-auto">
 
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center gap-2" href="{{ url_for('index') }}">
+                <i class="fa-solid fa-house"></i> Início
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center gap-2" href="{{ url_for('pagina_favoritos') }}">
+                <i class="fa-solid fa-star"></i> Favoritos
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center gap-2" href="{{ url_for('cadastro_abertura') }}">
+                <i class="fa-solid fa-chess"></i> Cadastro Abertura
+              </a>
+            </li>
+          </ul>
         </div>
     </nav>
 
