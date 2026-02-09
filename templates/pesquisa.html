@@ -78,33 +78,49 @@
   </form>
 
   <!-- RESULTADOS -->
-  <div class="row">
-
+<div class="row g-3">
     {% for abertura in aberturas %}
-      <div class="col-md-4 mb-4">
-        <div class="card h-100 abertura-card"
-             onclick="window.location.href='{{ url_for('abertura_detalhada', id_abertura=abertura.idAbertura) }}'">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 abertura-card d-flex flex-column"
+             onclick="window.location.href='{{ url_for('abertura_detalhada', id_abertura=abertura.idAbertura) }}'"
+             style="cursor: pointer;">
 
-            <button class="fav-btn"
-              onclick="event.stopPropagation()"
-              data-url="{{ url_for('favoritar_abertura', id_abertura=abertura.idAbertura) }}">
-            </button>
-          <img src="{{ url_for('static', filename='tabuleiros/' ~ abertura.img_tabuleiro) }}"
-               class="card-img-top"
-               alt="{{ abertura.Nome }}">
+            <img src="{{ url_for('static', filename='tabuleiros/' ~ abertura.img_tabuleiro) }}"
+                 class="card-img-top"
+                 alt="{{ abertura.Nome }}">
 
-          <div class="card-body">
-            <h5 class="card-title">{{ abertura.Nome }}</h5>
-            <p class="card-text">{{ abertura.Descricao }}</p>
+            <div class="card-body">
+                <h5 class="card-title">{{ abertura.Nome }}</h5>
+                <p class="card-text">{{ abertura.Descricao }}</p>
 
-            <span class="badge bg-primary">{{ abertura.Tipo }}</span>
-            <span class="badge bg-success">{{ abertura.Nivel }}</span>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
+                <span class="badge bg-primary">
+                    <i class="fa-solid fa-tag me-1"></i> {{ abertura.Tipo }}
+                </span>
+                <span class="badge bg-success">
+                    <i class="fa-solid fa-layer-group me-1"></i> {{ abertura.Nivel }}
+                </span>
+            </div>
 
-  </div>
+            <div class="card-footer bg-transparent border-0 text-end">
+                {% if abertura.idAbertura in favoritos_ids %}
+                <form action="{{ url_for('desfavoritar_abertura', id_abertura=abertura.idAbertura) }}" method="post" class="d-inline">
+                    <button type="submit" class="fav-btn-text favoritado" onclick="event.stopPropagation()">
+                        <i class="fa-solid fa-star text-warning"></i> Remover favorito
+                    </button>
+                </form>
+                {% else %}
+                <form action="{{ url_for('favoritar_abertura', id_abertura=abertura.idAbertura) }}" method="post" class="d-inline">
+                    <button type="submit" class="fav-btn-text" onclick="event.stopPropagation()">
+                        <i class="fa-regular fa-star"></i> Favoritar
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div> </div> {% endfor %} </div> {% if aberturas|length == 0 %}
+    <div class="col-12 text-center mt-5">
+        <h4 class="text-white"><i class="fa-solid fa-magnifying-glass-chart mb-3 d-block"></i> Nenhuma abertura encontrada 😕</h4>
+    </div>
+{% endif %}
 
   <!-- SEM RESULTADOS -->
   {% if aberturas|length == 0 %}

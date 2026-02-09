@@ -13,13 +13,15 @@
   color: #2e7d32 !important;
 }
 
-p{
-    color: #141414 !important;
+p {
+    color: #ffffff !important; 
 }
 
-p:hover{
-   color: #ffffff !important
+/* Garante que o texto da descrição do card seja branco/cinza claro */
+.card-text {
+    color: #e0e0e0 !important; 
 }
+
 .card:hover .card-text {
   color: #2e7d32 !important;
 }
